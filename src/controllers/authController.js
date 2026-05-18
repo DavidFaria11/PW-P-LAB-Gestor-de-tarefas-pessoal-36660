@@ -13,6 +13,7 @@ exports.register = async (req, res) => {
     });
     res.status(201).json({ message: 'Utilizador criado', userId: user.id });
   } catch (e) {
+    console.error(e);
     res.status(400).json({ error: 'Email já existe' });
   }
 };
@@ -29,6 +30,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
     res.json({ token });
   } catch (e) {
-    res.status(500).json({ error: 'Erro no servidor' });
+    console.error(e.message);
+    res.status(400).json({ error: 'Email já existe' });
   }
 };
