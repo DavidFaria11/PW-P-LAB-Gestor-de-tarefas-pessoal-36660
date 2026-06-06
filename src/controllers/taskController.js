@@ -13,18 +13,20 @@ exports.getTasks = async (req, res) => {
 };
 
 exports.createTask = async (req, res) => {
-  const { title, description, category, priority, deadline } = req.body;
+  const { title, description, category, priority, deadline, time } = req.body;
   try {
     const task = await prisma.task.create({
       data: {
         title, description, category,
         priority: priority || 'media',
         deadline: deadline ? new Date(deadline) : null,
+        time: time || null,
         userId: req.userId
       }
     });
     res.status(201).json(task);
   } catch (e) {
+    console.error(e.message);
     res.status(400).json({ error: 'Erro ao criar tarefa' });
   }
 };

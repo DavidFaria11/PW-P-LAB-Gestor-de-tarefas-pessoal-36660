@@ -11,14 +11,11 @@ export default function App() {
   const [page, setPage] = useState('login');
   const [refresh, setRefresh] = useState(0);
 
-  const handleLogin = () => {
-    setToken(localStorage.getItem('token'));
-  };
+  const handleLogin = () => setToken(localStorage.getItem('token'));
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setToken(null);
-    setPage('login');
   };
 
   const handleCreated = () => setRefresh(r => r + 1);
@@ -35,14 +32,16 @@ export default function App() {
   }
 
   return (
-    <div className="container">
-      <div className="header">
-        <h1>Gestor de Tarefas</h1>
-        <button onClick={handleLogout}>Logout</button>
+    <div>
+      <nav className="navbar">
+        <span className="logo">📋 Gestor de Tarefas</span>
+        <button onClick={handleLogout}>Sair</button>
+      </nav>
+      <div className="container">
+        <Stats refresh={refresh} />
+        <TaskForm onCreated={handleCreated} />
+        <TaskList refresh={refresh} />
       </div>
-      <Stats refresh={refresh} />
-      <TaskForm onCreated={handleCreated} />
-      <TaskList refresh={refresh} />
     </div>
   );
 }

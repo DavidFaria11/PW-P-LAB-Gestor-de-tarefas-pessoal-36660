@@ -5,7 +5,9 @@ export default function Stats({ refresh }) {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    getStats().then(setStats);
+    getStats().then(data => {
+      if (data && !data.error) setStats(data);
+    });
   }, [refresh]);
 
   if (!stats) return null;
@@ -17,7 +19,7 @@ export default function Stats({ refresh }) {
       <p>Concluídas: <strong>{stats.concluidas}</strong></p>
       <p>Pendentes: <strong>{stats.pendentes}</strong></p>
       <h4>Por categoria:</h4>
-      {Object.entries(stats.porCategoria).map(([cat, count]) => (
+      {stats.porCategoria && Object.entries(stats.porCategoria).map(([cat, count]) => (
         <p key={cat}>{cat}: <strong>{count}</strong></p>
       ))}
     </div>
