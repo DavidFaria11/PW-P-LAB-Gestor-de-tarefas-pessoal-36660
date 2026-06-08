@@ -13,7 +13,7 @@ exports.getTasks = async (req, res) => {
 };
 
 exports.createTask = async (req, res) => {
-  const { title, description, category, priority, deadline, time } = req.body;
+  const { title, description, category, priority, deadline, time, recurrence } = req.body;
   try {
     const task = await prisma.task.create({
       data: {
@@ -21,6 +21,7 @@ exports.createTask = async (req, res) => {
         priority: priority || 'media',
         deadline: deadline ? new Date(deadline) : null,
         time: time || null,
+        recurrence: recurrence || null,
         userId: req.userId
       }
     });

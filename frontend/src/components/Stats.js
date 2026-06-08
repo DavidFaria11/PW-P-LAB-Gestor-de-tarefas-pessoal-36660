@@ -13,15 +13,19 @@ export default function Stats({ refresh }) {
   if (!stats) return null;
 
   return (
-    <div className="stats">
-      <h3>Estatísticas</h3>
-      <p>Total: <strong>{stats.total}</strong></p>
-      <p>Concluídas: <strong>{stats.concluidas}</strong></p>
-      <p>Pendentes: <strong>{stats.pendentes}</strong></p>
-      <h4>Por categoria:</h4>
-      {stats.porCategoria && Object.entries(stats.porCategoria).map(([cat, count]) => (
-        <p key={cat}>{cat}: <strong>{count}</strong></p>
-      ))}
+    <div className="stats-bar">
+      <div className="stat-pill">
+        <div className="num">{stats.total}</div>
+        <div className="label">Total</div>
+      </div>
+      <div className="stat-pill">
+        <div className="num">{stats.concluidas}</div>
+        <div className="label">Concluídas</div>
+      </div>
+      <div className="stat-pill">
+        <div className="num">{stats.pendentes}</div>
+        <div className="label">Pendentes</div>
+      </div>
     </div>
   );
 }

@@ -23,6 +23,8 @@ model Task {
   category    String
   priority    String    @default("media")
   deadline    DateTime?
+  time        String?
+  recurrence  String?
   status      String    @default("ativa")
   createdAt   DateTime  @default(now())
   userId      Int
