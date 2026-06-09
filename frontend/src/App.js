@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Login from './components/Login';
@@ -6,6 +6,7 @@ import Register from './components/Register';
 import TaskList from './components/TaskList';
 import TaskForm from './components/TaskForm';
 import Stats from './components/Stats';
+import ProfileModal from './components/ProfileModal';
 import './App.css';
 
 const DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -30,10 +31,48 @@ export default function App() {
   const [showModal, setShowModal] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const [allTasks, setAllTasks] = useState([]);
+  const [showProfile, setShowProfile] = useState(false);
 
   const handleLogin = () => setToken(localStorage.getItem('token'));
   const handleLogout = () => { localStorage.removeItem('token'); setToken(null); };
   const handleCreated = () => setRefresh(r => r + 1);
+
+  useEffect(() => {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!token || allTasks.length === 0) return;
+
+    const check = () => {
+      const now = new Date();
+      allTasks.forEach(t => {
+        if (!t.deadline || t.status !== 'ativa') return;
+        const deadline = new Date(t.deadline);
+        if (t.time) {
+          const [h, m] = t.time.split(':');
+          deadline.setHours(Number(h), Number(m), 0, 0);
+        } else {
+          deadline.setHours(9, 0, 0, 0);
+        }
+        const diff = deadline - now;
+        if (diff > 0 && diff <= 30 * 60 * 1000) {
+          if (Notification.permission === 'granted') {
+            new Notification('📋 Tarefa próxima!', {
+              body: `"${t.title}" está prevista para daqui a pouco.`,
+              icon: '/favicon.ico'
+            });
+          }
+        }
+      });
+    };
+
+    check();
+    const interval = setInterval(check, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [allTasks, token]);
 
   const prevWeek = () => {
     const d = new Date(weekBase);
@@ -71,7 +110,10 @@ export default function App() {
     <div>
       <nav className="navbar">
         <span className="logo">📋 Gestor de Tarefas</span>
-        <button onClick={handleLogout}>Sair</button>
+        <div className="navbar-actions">
+          <button className="btn-profile" onClick={() => setShowProfile(true)}>👤</button>
+          <button onClick={handleLogout}>Sair</button>
+        </div>
       </nav>
       <div className="container">
         <Stats refresh={refresh} />
@@ -101,7 +143,7 @@ export default function App() {
               const isActive = d.toDateString() === selectedDate.toDateString();
               const isToday = d.toDateString() === today.toDateString();
               const count = allTasks.filter(t => {
-                if (!t.deadline) return false;
+                if (!t.deadline || t.status !== 'ativa') return false;
                 const taskDate = new Date(t.deadline);
                 if (taskDate.toDateString() === d.toDateString()) return true;
                 if (t.recurrence && taskDate <= d) {
@@ -136,6 +178,8 @@ export default function App() {
           selectedDate={selectedDate}
         />
       )}
+
+      {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
     </div>
   );
 }

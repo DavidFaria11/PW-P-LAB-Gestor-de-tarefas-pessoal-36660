@@ -2,6 +2,19 @@ import { useState, useEffect } from 'react';
 import { getTasks, updateTask, deleteTask } from '../api';
 import EditTaskModal from './EditTaskModal';
 
+const sameDay = (a, b) => {
+  const da = new Date(a);
+  const db = new Date(b);
+  return da.getUTCFullYear() === db.getUTCFullYear() &&
+         da.getUTCMonth() === db.getUTCMonth() &&
+         da.getUTCDate() === db.getUTCDate();
+};
+
+const getLocalDate = (d) => {
+  const date = new Date(d);
+  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+};
+
 export default function TaskList({ refresh, selectedDate, setAllTasks }) {
   const [tasks, setTasks] = useState({ atrasadas: [], hoje: [], futuras: [] });
   const [filters, setFilters] = useState({ priority: '', status: '' });
@@ -13,13 +26,15 @@ export default function TaskList({ refresh, selectedDate, setAllTasks }) {
     if (!Array.isArray(data)) return;
     if (setAllTasks) setAllTasks(data);
 
+    const selected = new Date(selectedDate);
+    selected.setHours(0, 0, 0, 0);
+
     const filtered = data.filter(t => {
       if (!t.deadline) return false;
-      const taskDate = new Date(t.deadline);
-      const selected = new Date(selectedDate);
+      const taskDate = getLocalDate(t.deadline);
 
       let matches = false;
-      if (taskDate.toDateString() === selected.toDateString()) matches = true;
+      if (sameDay(taskDate, selected)) matches = true;
       if (t.recurrence && taskDate <= selected) {
         if (t.recurrence === 'diaria') matches = true;
         if (t.recurrence === 'semanal' && taskDate.getDay() === selected.getDay()) matches = true;
@@ -33,18 +48,19 @@ export default function TaskList({ refresh, selectedDate, setAllTasks }) {
       return true;
     });
 
-    const today = new Date();
     const atrasadas = filtered.filter(t => {
-      const d = new Date(t.deadline);
-      return d < today && d.toDateString() !== today.toDateString() && t.status === 'ativa';
+      const d = getLocalDate(t.deadline);
+      return d < selected && !sameDay(d, selected) && t.status === 'ativa' && !t.recurrence;
     });
+
     const hojeT = filtered.filter(t => {
-      const d = new Date(t.deadline);
-      return d.toDateString() === today.toDateString() || t.recurrence;
+      const d = getLocalDate(t.deadline);
+      return sameDay(d, selected) || t.recurrence;
     });
+
     const futuras = filtered.filter(t => {
-      const d = new Date(t.deadline);
-      return d > today && d.toDateString() !== today.toDateString() && !t.recurrence;
+      const d = getLocalDate(t.deadline);
+      return d > selected && !sameDay(d, selected) && !t.recurrence;
     });
 
     const sortByTime = (arr) => arr.sort((a, b) => {
