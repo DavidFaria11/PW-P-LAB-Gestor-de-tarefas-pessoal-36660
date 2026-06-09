@@ -7,6 +7,15 @@ const headers = () => ({
   Authorization: `Bearer ${getToken()}`
 });
 
+const handleResponse = async (res) => {
+  if (res.status === 401) {
+    localStorage.removeItem('token');
+    window.location.reload();
+    return {};
+  }
+  return res.json();
+};
+
 export const register = (data) =>
   fetch(`${API_URL}/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(r => r.json());
 
@@ -15,17 +24,17 @@ export const login = (data) =>
 
 export const getTasks = (filters = {}) => {
   const params = new URLSearchParams(filters).toString();
-  return fetch(`${API_URL}/tasks?${params}`, { headers: headers() }).then(r => r.json());
+  return fetch(`${API_URL}/tasks?${params}`, { headers: headers() }).then(handleResponse);
 };
 
 export const createTask = (data) =>
-  fetch(`${API_URL}/tasks`, { method: 'POST', headers: headers(), body: JSON.stringify(data) }).then(r => r.json());
+  fetch(`${API_URL}/tasks`, { method: 'POST', headers: headers(), body: JSON.stringify(data) }).then(handleResponse);
 
 export const updateTask = (id, data) =>
-  fetch(`${API_URL}/tasks/${id}`, { method: 'PUT', headers: headers(), body: JSON.stringify(data) }).then(r => r.json());
+  fetch(`${API_URL}/tasks/${id}`, { method: 'PUT', headers: headers(), body: JSON.stringify(data) }).then(handleResponse);
 
 export const deleteTask = (id) =>
-  fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE', headers: headers() }).then(r => r.json());
+  fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE', headers: headers() }).then(handleResponse);
 
 export const getStats = () =>
-  fetch(`${API_URL}/tasks/stats`, { headers: headers() }).then(r => r.json());
+  fetch(`${API_URL}/tasks/stats`, { headers: headers() }).then(handleResponse);

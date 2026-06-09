@@ -29,6 +29,7 @@ export default function App() {
   const [weekBase, setWeekBase] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
+  const [allTasks, setAllTasks] = useState([]);
 
   const handleLogin = () => setToken(localStorage.getItem('token'));
   const handleLogout = () => { localStorage.removeItem('token'); setToken(null); };
@@ -99,18 +100,31 @@ export default function App() {
             {weekDays.map((d, i) => {
               const isActive = d.toDateString() === selectedDate.toDateString();
               const isToday = d.toDateString() === today.toDateString();
+              const count = allTasks.filter(t => {
+                if (!t.deadline) return false;
+                const taskDate = new Date(t.deadline);
+                if (taskDate.toDateString() === d.toDateString()) return true;
+                if (t.recurrence && taskDate <= d) {
+                  if (t.recurrence === 'diaria') return true;
+                  if (t.recurrence === 'semanal' && taskDate.getDay() === d.getDay()) return true;
+                  if (t.recurrence === 'mensal' && taskDate.getDate() === d.getDate()) return true;
+                  if (t.recurrence === 'anual' && taskDate.getDate() === d.getDate() && taskDate.getMonth() === d.getMonth()) return true;
+                }
+                return false;
+              }).length;
               return (
                 <div key={i} className={`week-day ${isActive ? 'active' : ''}`} onClick={() => setSelectedDate(d)}>
                   <span className="day-name">{DAYS[d.getDay()]}</span>
                   <span className="day-num">{d.getDate()}</span>
-                  {isToday && <span className="day-dot" />}
+                  {count > 0 && <span className="day-count">{count}</span>}
+                  {isToday && count === 0 && <span className="day-dot" />}
                 </div>
               );
             })}
           </div>
         </div>
 
-        <TaskList refresh={refresh} selectedDate={selectedDate} />
+        <TaskList refresh={refresh} selectedDate={selectedDate} setAllTasks={setAllTasks} />
       </div>
 
       <button className="fab" onClick={() => setShowModal(true)}>+</button>

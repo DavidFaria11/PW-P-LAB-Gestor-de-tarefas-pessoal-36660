@@ -58,7 +58,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0;
 .fab:hover { background: #4338ca; transform: translateX(-50%) scale(1.08); }
 
 /* MODAL */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
 .modal { background: #1e293b; border-radius: 20px 20px 0 0; padding: 28px 24px 40px; width: 100%; max-width: 680px; border-top: 1px solid #334155; }
 .modal h3 { font-size: 1.1rem; margin-bottom: 20px; color: #e2e8f0; }
 .modal-form { display: flex; flex-direction: column; gap: 12px; }
@@ -110,3 +110,27 @@ body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0;
 .picker-wrapper .react-datepicker__navigation-icon::before { border-color: #94a3b8; }
 
 .badge.rec { background: #0f3460; color: #93c5fd; }
+
+.task-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.task-checkbox { width: 18px; height: 18px; accent-color: #4f46e5; cursor: pointer; flex-shrink: 0; }
+.btn-delete-small { margin-left: auto; background: #450a0a; border: none; cursor: pointer; font-size: 0.85rem; opacity: 0.8; transition: all 0.2s; padding: 4px 8px; border-radius: 6px; color: #fca5a5; }
+.btn-delete-small:hover { opacity: 1; background: #7f1d1d; }
+
+.progress-bar { height: 4px; background: #1e293b; border-radius: 4px; margin-bottom: 16px; overflow: hidden; }
+.progress-fill { height: 100%; background: #4f46e5; border-radius: 4px; transition: width 0.3s; }
+.progress-label { font-size: 0.8rem; color: #64748b; }
+
+.task-group { margin-bottom: 20px; }
+.group-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 0; margin-bottom: 10px; border-bottom: 1px solid #1e293b; }
+.group-label.atrasadas { color: #ef4444; border-color: #450a0a; }
+.group-label.hoje { color: #818cf8; border-color: #1e1b4b; }
+.group-label.futuras { color: #34d399; border-color: #052e16; }
+
+.day-count { font-size: 0.7rem; font-weight: 700; background: #4f46e5; color: white; border-radius: 10px; padding: 1px 6px; min-width: 18px; text-align: center; }
+.week-day.active .day-count { background: white; color: #4f46e5; }
+
+.btn-edit-small { background: #1e3a5f; border: none; cursor: pointer; font-size: 0.85rem; padding: 4px 8px; border-radius: 6px; color: #93c5fd; transition: all 0.2s; }
+.btn-edit-small:hover { background: #1e40af; }
+.search-row { margin-bottom: 12px; }
+.search-input { width: 100%; padding: 10px 14px; background: #1e293b; border: 1px solid #334155; border-radius: 10px; color: #e2e8f0; font-size: 0.9rem; }
+.search-input:focus { outline: none; border-color: #4f46e5; }

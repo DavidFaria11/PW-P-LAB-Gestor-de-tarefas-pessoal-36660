@@ -38,12 +38,24 @@ exports.updateTask = async (req, res) => {
     const task = await prisma.task.findFirst({ where: { id: Number(id), userId: req.userId } });
     if (!task) return res.status(404).json({ error: 'Tarefa não encontrada' });
 
+    const { title, description, category, priority, deadline, time, recurrence, status } = req.body;
+
     const updated = await prisma.task.update({
       where: { id: Number(id) },
-      data: req.body
+      data: {
+        ...(title && { title }),
+        ...(description !== undefined && { description }),
+        ...(category && { category }),
+        ...(priority && { priority }),
+        ...(deadline !== undefined && { deadline: deadline ? new Date(deadline) : null }),
+        ...(time !== undefined && { time }),
+        ...(recurrence !== undefined && { recurrence }),
+        ...(status && { status })
+      }
     });
     res.json(updated);
   } catch (e) {
+    console.error(e.message);
     res.status(400).json({ error: 'Erro ao atualizar tarefa' });
   }
 };
