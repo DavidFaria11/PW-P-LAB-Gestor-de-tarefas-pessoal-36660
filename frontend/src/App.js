@@ -1,37 +1,29 @@
 import { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'moment/locale/pt';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import Login from './components/Login';
 import Register from './components/Register';
-import TaskList from './components/TaskList';
 import TaskForm from './components/TaskForm';
+import TaskList from './components/TaskList';
 import Stats from './components/Stats';
 import ProfileModal from './components/ProfileModal';
+import { getTasks } from './api';
 import './App.css';
 
-const DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-
-function getWeekDays(baseDate) {
-  const day = baseDate.getDay();
-  const week = [];
-  for (let i = -day; i < 7 - day; i++) {
-    const d = new Date(baseDate);
-    d.setDate(baseDate.getDate() + i);
-    week.push(d);
-  }
-  return week;
-}
+moment.locale('pt');
+const localizer = momentLocalizer(moment);
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [page, setPage] = useState('login');
   const [refresh, setRefresh] = useState(0);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [weekBase, setWeekBase] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
-  const [showPicker, setShowPicker] = useState(false);
-  const [allTasks, setAllTasks] = useState([]);
   const [showProfile, setShowProfile] = useState(false);
+  const [allTasks, setAllTasks] = useState([]);
+  const [showDayPanel, setShowDayPanel] = useState(false);
 
   const handleLogin = () => setToken(localStorage.getItem('token'));
   const handleLogout = () => { localStorage.removeItem('token'); setToken(null); };
@@ -45,7 +37,6 @@ export default function App() {
 
   useEffect(() => {
     if (!token || allTasks.length === 0) return;
-
     const check = () => {
       const now = new Date();
       allTasks.forEach(t => {
@@ -68,32 +59,38 @@ export default function App() {
         }
       });
     };
-
     check();
     const interval = setInterval(check, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [allTasks, token]);
 
-  const prevWeek = () => {
-    const d = new Date(weekBase);
-    d.setDate(d.getDate() - 7);
-    setWeekBase(d);
+  useEffect(() => {
+    if (!token) return;
+    getTasks({}).then(data => {
+      if (Array.isArray(data)) setAllTasks(data);
+    });
+  }, [token, refresh]);
+
+  const events = allTasks
+    .filter(t => t.deadline)
+    .map(t => ({
+      id: t.id,
+      title: t.title,
+      start: new Date(t.deadline),
+      end: new Date(t.deadline),
+      status: t.status,
+      priority: t.priority
+    }));
+
+  const handleSelectSlot = ({ start }) => {
+    setSelectedDate(start);
+    setShowDayPanel(true);
   };
 
-  const nextWeek = () => {
-    const d = new Date(weekBase);
-    d.setDate(d.getDate() + 7);
-    setWeekBase(d);
+  const handleSelectEvent = (event) => {
+    setSelectedDate(new Date(event.start));
+    setShowDayPanel(true);
   };
-
-  const handlePickerChange = (date) => {
-    setSelectedDate(date);
-    setWeekBase(date);
-    setShowPicker(false);
-  };
-
-  const weekDays = getWeekDays(weekBase);
-  const today = new Date();
 
   if (!token) {
     return (
@@ -107,7 +104,7 @@ export default function App() {
   }
 
   return (
-    <div>
+    <div className="app-layout">
       <nav className="navbar">
         <span className="logo">📋 Gestor de Tarefas</span>
         <div className="navbar-actions">
@@ -115,59 +112,61 @@ export default function App() {
           <button onClick={handleLogout}>Sair</button>
         </div>
       </nav>
-      <div className="container">
-        <Stats refresh={refresh} />
 
-        <div className="week-calendar">
-          <div className="calendar-header">
-            <button className="cal-nav" onClick={prevWeek}>‹</button>
-            <button className="cal-title" onClick={() => setShowPicker(!showPicker)}>
-              📅 {weekBase.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' })}
-            </button>
-            <button className="cal-nav" onClick={nextWeek}>›</button>
-          </div>
-
-          {showPicker && (
-            <div className="picker-wrapper">
-              <DatePicker
-                selected={selectedDate}
-                onChange={handlePickerChange}
-                inline
-                locale="pt"
-              />
-            </div>
-          )}
-
-          <div className="week-days">
-            {weekDays.map((d, i) => {
-              const isActive = d.toDateString() === selectedDate.toDateString();
-              const isToday = d.toDateString() === today.toDateString();
-              const count = allTasks.filter(t => {
-                if (!t.deadline || t.status !== 'ativa') return false;
-                const taskDate = new Date(t.deadline);
-                if (taskDate.toDateString() === d.toDateString()) return true;
-                if (t.recurrence && taskDate <= d) {
-                  if (t.recurrence === 'diaria') return true;
-                  if (t.recurrence === 'semanal' && taskDate.getDay() === d.getDay()) return true;
-                  if (t.recurrence === 'mensal' && taskDate.getDate() === d.getDate()) return true;
-                  if (t.recurrence === 'anual' && taskDate.getDate() === d.getDate() && taskDate.getMonth() === d.getMonth()) return true;
-                }
-                return false;
-              }).length;
-              return (
-                <div key={i} className={`week-day ${isActive ? 'active' : ''}`} onClick={() => setSelectedDate(d)}>
-                  <span className="day-name">{DAYS[d.getDay()]}</span>
-                  <span className="day-num">{d.getDate()}</span>
-                  {count > 0 && <span className="day-count">{count}</span>}
-                  {isToday && count === 0 && <span className="day-dot" />}
-                </div>
-              );
-            })}
-          </div>
+      <div className="main-content">
+        <div className="stats-bar-top">
+          <Stats refresh={refresh} />
         </div>
 
-        <TaskList refresh={refresh} selectedDate={selectedDate} setAllTasks={setAllTasks} />
+        <div className="calendar-wrapper">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: '100%' }}
+            onSelectSlot={handleSelectSlot}
+            onSelectEvent={handleSelectEvent}
+            selectable
+            eventPropGetter={(event) => ({
+              style: {
+                backgroundColor: event.status === 'concluida' ? '#166534' :
+                  event.priority === 'alta' ? '#450a0a' :
+                  event.priority === 'media' ? '#431407' : '#1e1b4b',
+                color: event.status === 'concluida' ? '#86efac' :
+                  event.priority === 'alta' ? '#fca5a5' :
+                  event.priority === 'media' ? '#fdba74' : '#a5b4fc',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '0.8rem',
+                padding: '2px 6px'
+              }
+            })}
+            messages={{
+              next: '›',
+              previous: '‹',
+              today: 'Hoje',
+              month: 'Mês',
+              week: 'Semana',
+              day: 'Dia',
+              agenda: 'Agenda',
+              noEventsInRange: 'Sem tarefas neste período'
+            }}
+          />
+        </div>
       </div>
+
+      {showDayPanel && (
+        <div className="day-panel-overlay" onClick={() => setShowDayPanel(false)}>
+          <div className="day-panel" onClick={e => e.stopPropagation()}>
+            <div className="day-panel-header">
+              <h3>{selectedDate.toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
+              <button onClick={() => setShowDayPanel(false)}>✕</button>
+            </div>
+            <TaskList refresh={refresh} selectedDate={selectedDate} setAllTasks={setAllTasks} />
+          </div>
+        </div>
+      )}
 
       <button className="fab" onClick={() => setShowModal(true)}>+</button>
 

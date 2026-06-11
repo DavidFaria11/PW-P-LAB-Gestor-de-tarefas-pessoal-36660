@@ -106,15 +106,15 @@ export default function TaskList({ refresh, selectedDate, setAllTasks }) {
         <h4 style={{ textDecoration: task.status === 'concluida' ? 'line-through' : 'none', opacity: task.status === 'concluida' ? 0.5 : 1 }}>
           {task.title}
         </h4>
-        <button className="btn-edit-small" onClick={(e) => { e.stopPropagation(); setEditTask(task); }}>✏️</button>
-        <button className="btn-delete-small" onClick={(e) => { e.stopPropagation(); eliminar(task.id); }}>🗑</button>
+        <button className="btn-edit-small" onClick={(e) => { e.stopPropagation(); setEditTask(task); }}>Editar</button>
+        <button className="btn-delete-small" onClick={(e) => { e.stopPropagation(); eliminar(task.id); }}>Eliminar</button>
       </div>
       {task.description && <p>{task.description}</p>}
       <div className="task-meta">
         <span className={`badge ${task.priority}`}>{task.priority}</span>
         <span className="badge cat">{task.category}</span>
         {task.time && <span className="badge time">🕐 {task.time}</span>}
-        {task.recurrence && <span className="badge rec">🔁 {task.recurrence}</span>}
+        {task.recurrence && <span className="badge rec"> {task.recurrence}</span>}
       </div>
     </div>
   );
@@ -162,21 +162,21 @@ export default function TaskList({ refresh, selectedDate, setAllTasks }) {
 
       {tasks.atrasadas.length > 0 && (
         <div className="task-group">
-          <div className="group-label atrasadas">⚠️ Atrasadas</div>
+          <div className="group-label atrasadas">Atrasadas</div>
           {tasks.atrasadas.map(renderCard)}
         </div>
       )}
 
       {tasks.hoje.length > 0 && (
         <div className="task-group">
-          <div className="group-label hoje">📅 Hoje</div>
+          <div className="group-label hoje">Hoje</div>
           {tasks.hoje.map(renderCard)}
         </div>
       )}
 
       {tasks.futuras.length > 0 && (
         <div className="task-group">
-          <div className="group-label futuras">🔮 Futuras</div>
+          <div className="group-label futuras">Futuras</div>
           {tasks.futuras.map(renderCard)}
         </div>
       )}

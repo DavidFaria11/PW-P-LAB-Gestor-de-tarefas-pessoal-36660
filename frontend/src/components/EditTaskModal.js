@@ -32,7 +32,7 @@ export default function EditTaskModal({ task, onClose, onUpdated }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
-        <h3>✏️ Editar Tarefa</h3>
+        <h3>Editar Tarefa</h3>
         <form className="modal-form" onSubmit={handle}>
           <input
             placeholder="Título"
@@ -48,15 +48,15 @@ export default function EditTaskModal({ task, onClose, onUpdated }) {
           <div className="modal-row">
             <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} required>
               <option value="">Seleciona categoria</option>
-              <option value="casa">🏠 Casa</option>
-              <option value="trabalho">💼 Trabalho</option>
-              <option value="escola">📚 Escola</option>
-              <option value="outro">📌 Outro</option>
+              <option value="casa">Casa</option>
+              <option value="trabalho">Trabalho</option>
+              <option value="escola">Escola</option>
+              <option value="outro">Outro</option>
             </select>
             <select value={form.priority} onChange={e => setForm({...form, priority: e.target.value})}>
-              <option value="baixa">🟢 Baixa</option>
-              <option value="media">🟡 Média</option>
-              <option value="alta">🔴 Alta</option>
+              <option value="baixa">Baixa</option>
+              <option value="media">Média</option>
+              <option value="alta">Alta</option>
             </select>
           </div>
           <div className="modal-row">
@@ -72,11 +72,11 @@ export default function EditTaskModal({ task, onClose, onUpdated }) {
             />
           </div>
           <select value={form.recurrence} onChange={e => setForm({...form, recurrence: e.target.value})}>
-            <option value="">🔁 Sem repetição</option>
-            <option value="diaria">🔁 Diariamente</option>
-            <option value="semanal">🔁 Semanalmente</option>
-            <option value="mensal">🔁 Mensalmente</option>
-            <option value="anual">🔁 Anualmente</option>
+            <option value="">Sem repetição</option>
+            <option value="diaria">Diariamente</option>
+            <option value="semanal">Semanalmente</option>
+            <option value="mensal">Mensalmente</option>
+            <option value="anual">Anualmente</option>
           </select>
           {msg && <p className="msg error">{msg}</p>}
           <div className="modal-actions">
