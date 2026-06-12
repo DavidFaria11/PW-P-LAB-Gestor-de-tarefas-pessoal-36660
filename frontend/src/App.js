@@ -73,16 +73,50 @@ export default function App() {
     });
   }, [token, refresh]);
 
-  const events = allTasks
-    .filter(t => t.deadline)
-    .map(t => ({
-      id: t.id,
-      title: t.title,
-      start: new Date(t.deadline),
-      end: new Date(t.deadline),
-      status: t.status,
-      priority: t.priority
-    }));
+const events = [];
+allTasks.filter(t => t.deadline).forEach(t => {
+  const taskDate = new Date(t.deadline);
+  events.push({
+    id: t.id,
+    title: t.title,
+    start: new Date(t.deadline),
+    end: new Date(t.deadline),
+    status: t.status,
+    priority: t.priority
+  });
+
+  if (t.recurrence) {
+    const today = new Date();
+    const futureLimit = new Date();
+    futureLimit.setMonth(futureLimit.getMonth() + 3);
+
+    let current = new Date(taskDate);
+    while (current <= futureLimit) {
+      if (t.recurrence === 'diaria') {
+        current.setDate(current.getDate() + 1);
+      } else if (t.recurrence === 'semanal') {
+        current.setDate(current.getDate() + 7);
+      } else if (t.recurrence === 'mensal') {
+        current.setMonth(current.getMonth() + 1);
+      } else if (t.recurrence === 'anual') {
+        current.setFullYear(current.getFullYear() + 1);
+      } else {
+        break;
+      }
+
+      if (current > today) {
+        events.push({
+          id: `${t.id}-${current.getTime()}`,
+          title: t.title,
+          start: new Date(current),
+          end: new Date(current),
+          status: t.status,
+          priority: t.priority
+        });
+      }
+    }
+  }
+});
 
   const handleSelectSlot = ({ start }) => {
     setSelectedDate(start);
