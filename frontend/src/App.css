@@ -134,3 +134,9 @@ body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b;
 
 /* DAY COUNT */
 .day-count { font-size: 0.7rem; font-weight: 700; background: #3b82f6; color: white; border-radius: 10px; padding: 1px 6px; }
+
+.btn-add-day { background: #3b82f6; color: white; border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.2s; }
+.btn-add-day:hover { background: #2563eb; }
+
+.btn-add-day-bottom { width: 100%; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 0.95rem; font-weight: 600; margin-top: 16px; transition: all 0.2s; }
+.btn-add-day-bottom:hover { background: #2563eb; }

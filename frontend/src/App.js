@@ -20,6 +20,8 @@ export default function App() {
   const [page, setPage] = useState('login');
   const [refresh, setRefresh] = useState(0);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [calendarDate, setCalendarDate] = useState(new Date());
+  const [calendarView, setCalendarView] = useState('month');
   const [showModal, setShowModal] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [allTasks, setAllTasks] = useState([]);
@@ -125,6 +127,10 @@ export default function App() {
             startAccessor="start"
             endAccessor="end"
             style={{ height: '100%' }}
+            date={calendarDate}
+            view={calendarView}
+            onNavigate={(date) => setCalendarDate(date)}
+            onView={(view) => setCalendarView(view)}
             onSelectSlot={handleSelectSlot}
             onSelectEvent={handleSelectEvent}
             selectable
@@ -159,11 +165,16 @@ export default function App() {
       {showDayPanel && (
         <div className="day-panel-overlay" onClick={() => setShowDayPanel(false)}>
           <div className="day-panel" onClick={e => e.stopPropagation()}>
-            <div className="day-panel-header">
+            <div className="day-panel-header" style={{ padding: '24px 24px 0' }}>
               <h3>{selectedDate.toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
               <button onClick={() => setShowDayPanel(false)}>✕</button>
             </div>
-            <TaskList refresh={refresh} selectedDate={selectedDate} setAllTasks={setAllTasks} />
+            <div className="day-panel-content">
+              <TaskList refresh={refresh} selectedDate={selectedDate} setAllTasks={setAllTasks} />
+            </div>
+            <div className="day-panel-footer">
+              <button className="btn-add-day-bottom" onClick={() => setShowModal(true)}>+ Nova Tarefa</button>
+            </div>
           </div>
         </div>
       )}

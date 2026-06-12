@@ -1,4 +1,4 @@
-const API_URL = 'https://pw-p-lab-gestor-de-tarefas-pessoal.vercel.app/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 const getToken = () => localStorage.getItem('token');
 
