@@ -113,7 +113,7 @@ export default function TaskList({ refresh, selectedDate, setAllTasks }) {
       <div className="task-meta">
         <span className={`badge ${task.priority}`}>{task.priority}</span>
         <span className="badge cat">{task.category}</span>
-        {task.time && <span className="badge time">🕐 {task.time}</span>}
+        {task.time && <span className="badge time"> {task.time}</span>}
         {task.recurrence && <span className="badge rec"> {task.recurrence}</span>}
       </div>
     </div>

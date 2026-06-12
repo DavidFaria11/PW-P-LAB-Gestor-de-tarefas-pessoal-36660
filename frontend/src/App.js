@@ -53,7 +53,7 @@ export default function App() {
         const diff = deadline - now;
         if (diff > 0 && diff <= 30 * 60 * 1000) {
           if (Notification.permission === 'granted') {
-            new Notification('📋 Tarefa próxima!', {
+            new Notification(' Tarefa próxima!', {
               body: `"${t.title}" está prevista para daqui a pouco.`,
               icon: '/favicon.ico'
             });
@@ -142,7 +142,7 @@ allTasks.filter(t => t.deadline).forEach(t => {
   return (
     <div className="app-layout">
       <nav className="navbar">
-        <span className="logo">📋 Gestor de Tarefas</span>
+        <span className="logo">Gestor de Tarefas</span>
         <div className="navbar-actions">
           <button className="btn-profile" onClick={() => setShowProfile(true)}>👤</button>
           <button onClick={handleLogout}>Sair</button>
